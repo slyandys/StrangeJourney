@@ -46,6 +46,10 @@ void keyPressed() {
     setup();
     worldSetup();
   }
+  else if (key == 'f' && returnFromS3)
+  {
+    setFrozen = true;
+  }
   else {
     try {
       saveFrame("screenshot.png");
@@ -53,4 +57,8 @@ void keyPressed() {
     catch (Exception e) {
     }
   }
+}
+
+void keyReleased() {
+  if (key == 'f'  && setFrozen) setFrozen = false;
 }

@@ -22,17 +22,15 @@ FPoly polyButton;
 FPoly polyPent;
 FBlob polyPenta;
 
+//Scene script
 int screenNum = 0;
-int health;
 int dialog = 0;
 int initTime = 0;
 
+//Slow-witted position & health
+int health;
 float bposX=0;
 float bposY=0;
-
-int trinum = 0;
-int squnum = 0;
-int cirnum = 0;
 
 color buttonColor = #155AAD;
 color hoverColor = #55AA11;
@@ -40,35 +38,40 @@ color bodyColor = #6E0595;
 
 Boolean reflec = false;
 Boolean timeflag = false;
+Boolean learnShoot = false;
+Boolean returnFromS3 = false;
+
+Boolean setFrozen;
 
 void setup() {
+  
   size(1000, 800);
   smooth();
-  initTime = millis();
-
+  
   Fisica.init(this);
-
+  initTime = millis();
+  
   world = new FWorld();
   world.setGravity(0, 1000);
   world.setEdges();
-  health = 100;
-  //world.remove(world.left);
-  //world.remove(world.right);
-  //world.remove(world.top);
   world.setEdgesRestitution(0.5);
-
-  //main character
-  bola = new FCircle(40);
-
+  
+  //Set Princess
   princessImg = loadImage("Cage_peach_fake.png");
-
+  
+  //main character
+  health = 100;
+  bola = new FCircle(40);
   bola.setPosition(width/3, 60);
   bposX = width/3;
   bposY = 60;
   bola.setDensity(0.1);
   bola.setFill(120, 120, 190);
   bola.setNoStroke();
-  //world.add(bola);
+
+  //(New)ability
+  setFrozen = false;
+  bola.setGrabbable(false);
 }
 
 void worldSetup()
@@ -81,13 +84,12 @@ void worldSetup()
     world.add(world.left);
     world.add(world.top);
     world.add(world.bottom);
-    //world.remove(world.right);
+    
+    //Set bola
     bola.setPosition(bposX, bposY);
     world.add(bola);
   }
   if (screenNum == 2) {
-    //Fisica.init(this);
-    //world.setEdges();
     //dialog = 15;
     world.remove(world.left);
     world.remove(world.right);
@@ -103,22 +105,18 @@ void worldSetup()
     boxButton.setNoStroke();
     world.add(boxButton);
 
-    //    circleButton = new FCircle(40);
-    //    circleButton.setPosition(2*width/4, 100);
-    //    circleButton.setStatic(true);
-    //    circleButton.setFillColor(buttonColor);
-    //    circleButton.setNoStroke();
-    //    world.add(circleButton);
-
-    //    polyButton = new FPoly();
-    //    polyButton.vertex(20, 20);
-    //    polyButton.vertex(-20, 20);
-    //    polyButton.vertex(0, -20);
-    //    polyButton.setPosition(3*width/4, 100);
-    //    polyButton.setStatic(true);
-    //    polyButton.setFillColor(buttonColor);
-    //    polyButton.setNoStroke();
-    //    world.add(polyButton);
+    if (returnFromS3)
+    {
+      polyButton = new FPoly();
+      polyButton.vertex(20, 20);
+      polyButton.vertex(-20, 20);
+      polyButton.vertex(0, -20);
+      polyButton.setPosition(3*width/4, 100);
+      polyButton.setStatic(true);
+      polyButton.setFillColor(buttonColor);
+      polyButton.setNoStroke();
+      world.add(polyButton);
+    }
 
     bola.setPosition(bposX, bposY);
     world.add(bola);
@@ -129,28 +127,11 @@ void worldSetup()
     }
   }
   if (screenNum == 3) {
-    //Fisica.init(this);
-    //world.setEdges();
     dialog = 20;
     world.clear();
     world.add(world.right);
     world.add(world.top);
     world.add(world.bottom);
-    //world.setEdges();
-    //world.remove(world.right);
-    //world.setGravity(0, -1000);
-    //world.remove(boxButton);
-
-
-    //    polyButton = new FPoly();
-    //    polyButton.vertex(20, 20);
-    //    polyButton.vertex(-20, 20);
-    //    polyButton.vertex(0, -20);
-    //    polyButton.setPosition(3*width/4, 100);
-    //    polyButton.setStatic(true);
-    //    polyButton.setFillColor(buttonColor);
-    //    polyButton.setNoStroke();
-    //    world.add(polyButton);
 
     polyPent = new FPoly();
     polyPent.setName("pent");
@@ -164,19 +145,6 @@ void worldSetup()
     polyPent.setFillColor(buttonColor);
     polyPent.setNoStroke();
     world.add(polyPent);
-
-    //    polyPenta = new FBlob();
-    //    polyPenta.setName("pent");
-    //    polyPenta.vertex(20, 20);
-    //    polyPenta.vertex(45, 40);
-    //    polyPenta.vertex(95, 40);
-    //    polyPenta.vertex(120, 20);
-    //    polyPenta.vertex(108, 1);
-    //    polyPenta.setPosition(3*width/4, 100);
-    //    polyPenta.setStatic(true);
-    //    polyPenta.setFillColor(buttonColor);
-    //    polyPenta.setNoStroke();
-    //    world.add(polyPenta);
 
     bola.setPosition(bposX, bposY);
     world.add(bola);
@@ -211,7 +179,7 @@ void draw() {
       //health = 1;
       image(princessImg, 600, 0);
       scenStart();
-      if(health == 1 && dialog >= 30)
+      if (health == 1 && dialog >= 31)
       {
         SceneEnding();
       }
@@ -221,10 +189,11 @@ void draw() {
     {
       SceneTheHits();
       generation();
-      //     pushStyle();
+      
       displaysItemState();
-      //     popStyle();
+      
       reflec = false;
+
       if (frameCount % 12 == 0)
         world.setGravity(0, random(-1000, 1000));
     }
@@ -237,7 +206,7 @@ void draw() {
     if (screenNum == 3)
     {
       SceneThing();
-      if(timeflag)
+      if (timeflag)
       {
         SceneOver();
       }
@@ -293,15 +262,59 @@ void draw() {
 
 
 void generation() {
-  if (frameCount % 8 == 0) {
-    FBox myBox = new FBox(40, 40);
-    myBox.setPosition(width/4, 200);
-    myBox.setRotation(random(TWO_PI));
-    myBox.setVelocity(random(TWO_PI), random(TWO_PI));
-    //myBox.setVelocity(0, 200);
-    myBox.setFillColor(bodyColor);
-    myBox.setNoStroke();
-    world.add(myBox);
+  if (!setFrozen) {
+    if (frameCount % 8 == 0) {
+      FBox myBox = new FBox(40, 40);
+      myBox.setPosition(width/4, 200);
+      myBox.setRotation(random(TWO_PI));
+      myBox.setVelocity(random(TWO_PI)*10, random(TWO_PI)*10);
+      if (returnFromS3) myBox.setVelocity(random(TWO_PI)*100, random(TWO_PI)*100);
+      //myBox.setVelocity(0, 200);
+      myBox.setFillColor(bodyColor);
+      myBox.setNoStroke();
+      world.add(myBox);
+
+      if (returnFromS3)
+      {
+        FPoly myPoly = new FPoly();
+        myPoly.vertex(20, 20);
+        myPoly.vertex(-20, 20);
+        myPoly.vertex(0, -20);
+        myPoly.setPosition(3*width/4, 200);
+        myPoly.setRotation(random(TWO_PI));
+        myPoly.setVelocity(random(TWO_PI)*100, random(TWO_PI)*100);
+        myPoly.setFillColor(bodyColor);
+        myPoly.setNoStroke();
+        world.add(myPoly);
+      }
+    }
+  }else
+  {
+    if (frameCount % 800 == 0) {
+      FBox myBox = new FBox(40, 40);
+      myBox.setPosition(width/4, 200);
+      myBox.setRotation(random(TWO_PI));
+      myBox.setVelocity(random(TWO_PI)*10, random(TWO_PI)*10);
+      if (returnFromS3) myBox.setVelocity(random(TWO_PI)*100, random(TWO_PI)*100);
+      //myBox.setVelocity(0, 200);
+      myBox.setFillColor(bodyColor);
+      myBox.setNoStroke();
+      world.add(myBox);
+
+      if (returnFromS3)
+      {
+        FPoly myPoly = new FPoly();
+        myPoly.vertex(20, 20);
+        myPoly.vertex(-20, 20);
+        myPoly.vertex(0, -20);
+        myPoly.setPosition(3*width/4, 200);
+        myPoly.setRotation(random(TWO_PI));
+        myPoly.setVelocity(random(TWO_PI)*100, random(TWO_PI)*100);
+        myPoly.setFillColor(bodyColor);
+        myPoly.setNoStroke();
+        world.add(myPoly);
+      }
+    }
   }
 }
 
@@ -317,10 +330,7 @@ void contactStarted(FContact c) {
 
 
 
-    //    if(ball.getX()==809 && ball.getY() == 353)
-    //    {
-    //      world.remove(polyPent);
-    //    }
+
 
     if (ball == null) {
       return;
@@ -328,6 +338,8 @@ void contactStarted(FContact c) {
     if (ball == bola || ball == world.bottom || ball == world.top || ball == world.right ) {
       return;
     }
+
+
 
     println("eliminate ball # are: "+ ball);
     if (screenNum == 3) {
@@ -340,8 +352,24 @@ void contactStarted(FContact c) {
       {
         //println("shit");
         timeflag = true;
+        //learnShoot = true;
+        returnFromS3 = true;
+        bola.setGrabbable(true);
       }
     }
+
+    //    if (learnShoot)
+    //    {
+    //      for (Iterator iterator = bullets.iterator(); iterator.hasNext();) {
+    //        Bullet s = (Bullet) iterator.next();
+    //        if (dist(s.x - 20, s.y, ball.getX(), ball.getY() ) < 10) {
+    //          println("hittssss~~");
+    //          iterator.remove();
+    //          world.remove(ball);
+    //        }
+    //      }
+    //    }
+
     //println("the ball2 is: "+ ball2);
     ball.setFill(30, 190, 200);
     //ball.removeFromWorld();
@@ -415,6 +443,7 @@ void mouseReleased() {
     world.add(poly);
     poly = null;
   }
+  //bola.removeFromWorld();
 }
 
 

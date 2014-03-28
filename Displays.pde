@@ -39,8 +39,6 @@ void displaysItemState()
   textAlign(CENTER);
   textSize(30);
   text("Health: " + health , width / 2, height / 2+50);
-  //text("Number of circle: " + cirnum, width / 2, height / 2);
-  //text("Number of triangle: " + trinum, width / 2, height / 2 +50);
 }
 
 /*
@@ -99,7 +97,9 @@ void SceneOver()
     case 26:timer("But the princess....");break;
     case 27:timer("Slow-witted: What happen to her?");break;
     case 28:timer("NO-ONE: You can see by yourself");break;
-    case 29:timer("But you have to pass again..");break;
+    case 29:timer("But you have to pass again that path..");break;
+    case 30:timer("NB:You now can drag the slow-witted");break;
+    case 31:timer("Use 'f' to Frozze the Generator~");break;
   }
 }
 
@@ -107,13 +107,13 @@ void SceneEnding()
 {
   switch(dialog)
   {
-    case 30:timer("Princess:Amazing...");break;
-    case 31:timer("You are back.");break;
-    case 32:timer("Actually...");break;
-    case 33:timer("I am the monster");break;
-    case 34:timer("See you ..my dear~~hahahaha");break;
-    case 35:timer("To Be Continued..");break;
-    case 36:health = 0;break;
+    case 32:timer("Princess:Amazing...");break;
+    case 33:timer("You are back.");break;
+    case 34:timer("Actually...");break;
+    case 35:timer("I am the monster");break;
+    case 36:timer("See you ..my dear~~hahahaha");break;
+    case 37:timer("To Be Continued..");break;
+    case 38:health = 0;break;
   }
 }
 
