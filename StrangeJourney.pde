@@ -24,7 +24,7 @@ FBlob polyPenta;
 
 //Scene script
 int screenNum = 0;
-int dialog = 0;
+int dialog;
 int initTime = 0;
 
 //Slow-witted position & health
@@ -44,21 +44,21 @@ Boolean returnFromS3 = false;
 Boolean setFrozen;
 
 void setup() {
-  
+
   size(1000, 800);
   smooth();
-  
+
   Fisica.init(this);
   initTime = millis();
-  
+
   world = new FWorld();
   world.setGravity(0, 1000);
   world.setEdges();
   world.setEdgesRestitution(0.5);
-  
+
   //Set Princess
   princessImg = loadImage("Cage_peach_fake.png");
-  
+
   //main character
   health = 100;
   bola = new FCircle(40);
@@ -68,6 +68,8 @@ void setup() {
   bola.setDensity(0.1);
   bola.setFill(120, 120, 190);
   bola.setNoStroke();
+
+  dialog=0;
 
   //(New)ability
   setFrozen = false;
@@ -84,7 +86,7 @@ void worldSetup()
     world.add(world.left);
     world.add(world.top);
     world.add(world.bottom);
-    
+
     //Set bola
     bola.setPosition(bposX, bposY);
     world.add(bola);
@@ -189,9 +191,9 @@ void draw() {
     {
       SceneTheHits();
       generation();
-      
+
       displaysItemState();
-      
+
       reflec = false;
 
       if (frameCount % 12 == 0)
@@ -288,7 +290,8 @@ void generation() {
         world.add(myPoly);
       }
     }
-  }else
+  }
+  else
   {
     if (frameCount % 800 == 0) {
       FBox myBox = new FBox(40, 40);
